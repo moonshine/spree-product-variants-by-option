@@ -1,0 +1,10 @@
+<% content_for :sidebar do %>
+  <% hook :homepage_sidebar_navigation do %>
+    <% if "products" == @current_controller && @taxon %>
+      <%= render "shared/filters" %>
+    <% else %>
+      <%= render "shared/taxonomies" %>
+    <% end %>
+  <% end %>
+<% end %>
+
