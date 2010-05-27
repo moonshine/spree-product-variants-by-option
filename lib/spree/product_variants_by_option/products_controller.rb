@@ -1,5 +1,6 @@
 module Spree::ProductVariantsByOption::ProductsController
-  HTTP_REFERER_REGEXP = /^https?:\/\/[^\/]+\/t\/([a-z0-9\-\/]+\/)$/
+  include TaxonsHelper
+
   def self.included(target)
     target.class_eval do
       # Override spree product show method
@@ -42,11 +43,19 @@ module Spree::ProductVariantsByOption::ProductsController
           @variants[option_type_name] = variant unless @variants.include?(option_type_name)
         end
 
-        @taxon = @product
+        # For breadcrumbs we have to find the taxonomy selected to
+        # find this product. Not sure how else to do this other than
+        # via the referer
         referer = request.env['HTTP_REFERER']
-        if referer  && referer.match(HTTP_REFERER_REGEXP)
-          @taxon = Taxon.find_by_permalink($1)
-        end
+        permalink = referer.gsub(referer.slice(0..(referer.rindex('/t/')+2)), '') + '/'
+        @taxon = @product.taxons.find_by_permalink(permalink)
+        #@taxon = Taxon.new(:parent => taxon_parent, :taxonomy_id => taxon_parent.taxonomy_id,
+        #  :name => @product.name, :position => taxon_parent.position+1,
+        #  :permalink => taxon_parent.permalink + "#{@product.name}/") if taxon_parent
+
+        # Set this variable to allow us to customise breadcrumb behaviour as currently
+        # there are no hooks available to override this
+        @product_variants_by_option = true
 
         render :template => 'products/variants_by_option'
       else

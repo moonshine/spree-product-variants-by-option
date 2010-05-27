@@ -9,5 +9,6 @@ class ProductVariantsByOptionExtension < Spree::Extension
   def activate
     # Override spree products controller
     ProductsController.send(:include, Spree::ProductVariantsByOption::ProductsController)
+    TaxonsHelper.send(:include, Spree::ProductVariantsByOption::TaxonsHelper)
   end
 end
