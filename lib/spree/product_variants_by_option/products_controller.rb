@@ -1,5 +1,4 @@
 module Spree::ProductVariantsByOption::ProductsController
-  include TaxonsHelper
 
   def self.included(target)
     target.class_eval do
@@ -8,6 +7,8 @@ module Spree::ProductVariantsByOption::ProductsController
       def show; site_show; end
     end
   end
+
+  private
 
   # Show all variants for the selected product filtered
   # by the specified option
@@ -19,7 +20,7 @@ module Spree::ProductVariantsByOption::ProductsController
     # action will be called.
     @product = Product.find_by_permalink(params[:id])
     property = @product.properties.find_by_name("product_variants_by_option")
-    if property
+    if property && cookies[:product_variants_by_option_taxon]
       load_object
       before :show
 
@@ -44,14 +45,8 @@ module Spree::ProductVariantsByOption::ProductsController
         end
 
         # For breadcrumbs we have to find the taxonomy selected to
-        # find this product. Not sure how else to do this other than
-        # via the referer
-        referer = request.env['HTTP_REFERER']
-        permalink = referer.gsub(referer.slice(0..(referer.rindex('/t/')+2)), '') + '/'
-        @taxon = @product.taxons.find_by_permalink(permalink)
-        #@taxon = Taxon.new(:parent => taxon_parent, :taxonomy_id => taxon_parent.taxonomy_id,
-        #  :name => @product.name, :position => taxon_parent.position+1,
-        #  :permalink => taxon_parent.permalink + "#{@product.name}/") if taxon_parent
+        # find this product, we store this in a cookie.
+        @taxon = @product.taxons.find_by_permalink(cookies[:product_variants_by_option_taxon])
 
         # Set this variable to allow us to customise breadcrumb behaviour as currently
         # there are no hooks available to override this

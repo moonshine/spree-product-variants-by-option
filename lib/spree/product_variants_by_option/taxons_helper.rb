@@ -5,7 +5,12 @@ module Spree::ProductVariantsByOption::TaxonsHelper
       alias_method :breadcrumbs, :site_breadcrumbs
     end
   end
+
+  private
   
+  # Override breadcrumbs so that we can add the selected product
+  # to the breadcrumbs when displaying product variants, also
+  # make the taxon a link
   def site_breadcrumbs(taxon, separator="&nbsp;&raquo;&nbsp;")
     if @product_variants_by_option
       return "" if current_page?("/")
@@ -13,7 +18,8 @@ module Spree::ProductVariantsByOption::TaxonsHelper
       if taxon
         crumbs << content_tag(:li, link_to(t('products') , products_path) + separator)
         crumbs << taxon.ancestors.collect { |ancestor| content_tag(:li, link_to(ancestor.name , seo_url(ancestor)) + separator) } unless taxon.ancestors.empty?
-        crumbs << content_tag(:li, content_tag(:span, taxon.name))
+        crumbs << content_tag(:li, link_to(taxon.name, seo_url(taxon)) + separator)
+        crumbs << content_tag(:li, content_tag(:span, @product.name))
       else
         crumbs << content_tag(:li, content_tag(:span, t('products')))
       end
