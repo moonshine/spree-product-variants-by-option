@@ -5,6 +5,7 @@ module Spree::ProductVariantsByOption::ProductsController
       # Override spree product show method
       alias :spree_show :show
       def show; site_show; end
+      def show_variant; site_show_variant; end
     end
   end
 
@@ -67,6 +68,34 @@ module Spree::ProductVariantsByOption::ProductsController
 
   rescue ActiveRecord::RecordNotFound
     response_for :show_fails
+  end
+
+  # Action is called from the variants display page, links on this page has
+  # the format /products/:id/option/:option. We find the products and then the
+  # variants that have the selected value for the option. So for example we may
+  # have /products/teestanks/option/red, when the user selects this link we will
+  # find the teestanks product and all the variants red variants.
+  def site_show_variant
+    # Find products
+    @product = Product.find_by_permalink(params[:id])
+    # Find all product properties excluding the product_variants_by_option
+    # property
+    @product_properties = ProductProperty.find_all_by_product_id(@product.id,
+      :include => [:property], :conditions => "name != 'product_variants_by_option'")
+    # Find the product_variants_by_option property
+    property = @product.properties.find_by_name("product_variants_by_option")
+    if property
+      # Find all variants for the selected product that has the option specified
+      # in the product property product_variants_by_option (e.g. Color) and the
+      # selected value for that option (e.g. Red)
+      @variants = Variant.active.find_all_by_product_id(@product.id,
+        :include => [:images, {:option_values => :option_type}],
+        :conditions => "variants.is_master = FALSE AND option_types.name = '#{property.product_properties.first.value}' AND option_values.name = '#{params[:option]}'")
+      # Make sure it is available
+      @selected_variant = @variants.detect { |v| v.available? }
+    else
+      spree_show
+    end
   end
 
 end

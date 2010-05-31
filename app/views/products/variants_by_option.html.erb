@@ -2,3 +2,19 @@
   <%= render "shared/taxonomies" %>
 <% end %>
 
+<% if @variants.empty? %>
+  <%= t(:no_products_found) %>
+<% end %>
+
+<% if @variants.any? %>
+<ul class="product-listing">
+  <% @variants.each do |variant| %>
+    <li id="variant_<%= variant[1].id %>">
+      <%= link_to small_image(variant[1].product), variant[1].product %>
+      <%= link_to variant[1].sku + "<span class='price selling'>#{product_price(variant[1])}</span>", 
+        show_variant_path(:id => @product.permalink, :option => variant[0]), :class => 'info' %>
+    </li>
+  <% end %>
+</ul>
+<% end %>
+
