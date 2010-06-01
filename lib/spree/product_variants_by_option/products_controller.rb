@@ -78,6 +78,8 @@ module Spree::ProductVariantsByOption::ProductsController
   def site_show_variant
     # Find products
     @product = Product.find_by_permalink(params[:id])
+    # Find the taxonomy selected to find this product, we store this in a cookie.
+    @taxon = @product.taxons.find_by_permalink(cookies[:product_variants_by_option_taxon])
     # Find all product properties excluding the product_variants_by_option
     # property
     @product_properties = ProductProperty.find_all_by_product_id(@product.id,
