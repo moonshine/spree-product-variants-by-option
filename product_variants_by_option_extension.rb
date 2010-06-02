@@ -11,8 +11,10 @@ class ProductVariantsByOptionExtension < Spree::Extension
     # Capture navigation information and store in a cookie
     Spree::BaseController.send(:include, Spree::ProductVariantsByOption::TaxonsController)
     # Add short_description field to variants table
+    # Add display_variants_by_option to the products table
     Variant.additional_fields += [ 
-      {:name => 'short_description', :only => [:variant]} 
+      {:name => 'short_description', :only => [:variant]},
+      {:name => 'display_variants_by_option', :only => [:product]}
       ]
   end
 end

@@ -15,19 +15,19 @@ module Spree::ProductVariantsByOption::ProductsController
   # by the specified option
   def site_show
     # Check if we should display variants grouped by a particular
-    # option type. This is done via a product property named product_variants_by_option
-    # with the value being the name of the option to group by. If this
-    # property is not specified for the product then the normal show
-    # action will be called.
+    # option type. This is done via a new product field display_variants_by_option
+    # with the value being the name of the option type to group by. If this
+    # field is not specified for the product then the normal show action will be called.
     @product = Product.find_by_permalink(params[:id])
-    property = @product.properties.find_by_name("product_variants_by_option")
-    if property && cookies[:product_variants_by_option_taxon]
-      # Find all variants for selected product, exclude master variant
+    if !@product.display_variants_by_option.blank? && cookies[:product_variants_by_option_taxon]
+      # Find all variants for selected product, exclude master variant, sort by variants.id
+      # as we use the first variant to determine what images and short description to display.
       variants = Variant.active.find_all_by_product_id(@product.id,
-        :include => [:images, :option_values], :conditions => {:is_master => false})
+        :include => [:images, :option_values], :conditions => {:is_master => false},
+        :order => 'variants.id')
       # Find the option type we will group the variants by as specified in
-      # the product_variants_by_option product property
-      property_value = property.product_properties.first.value
+      # the display_variants_by_option product field
+      property_value = @product.display_variants_by_option
       option_type = OptionType.find_by_name(property_value)
       if option_type
         # Process all product variants, check each variant for the specified
@@ -46,8 +46,7 @@ module Spree::ProductVariantsByOption::ProductsController
         # find this product, we store this in a cookie.
         if cookies[:product_variants_by_option_taxon]
           @taxon = @product.taxons.find_by_permalink(cookies[:product_variants_by_option_taxon])
-          # Set this variable to allow us to customise breadcrumb behaviour as currently
-          # there are no hooks available to override this
+          # Construct a hash with additional breadcrumbs
           @product_variants_by_option = ActiveSupport::OrderedHash.new
           @product_variants_by_option[@product.name] = product_url(@product)
         end
@@ -55,10 +54,9 @@ module Spree::ProductVariantsByOption::ProductsController
         render :template => 'products/variants_by_option'
       else
         raise "The option type '#{property_value}'
-          specified in product property 'product_variants_by_option'
+          specified in product field 'Display variants by option'
           could not be found for product '#{@product.name}'. Make sure the
-          option type('#{property_value}') specified as the product property
-          'product_variants_by_option' value has been created and exists."
+          option type('#{property_value}') has been created and exists."
       end
     else
       # Property not defined do default show action
@@ -77,23 +75,22 @@ module Spree::ProductVariantsByOption::ProductsController
   def site_show_variant
     # Find products
     @product = Product.find_by_permalink(params[:id])
-    # Find all product properties excluding the product_variants_by_option
-    # property
-    @product_properties = ProductProperty.find_all_by_product_id(@product.id,
-      :include => [:property], :conditions => "properties.name != 'product_variants_by_option'")
-    # Find the product_variants_by_option property
-    property = @product.properties.find_by_name("product_variants_by_option")
-    if property
+    # Find all product properties
+    @product_properties = ProductProperty.find_all_by_product_id(@product.id, :include => [:property])
+    # Check if we need to display product group by an option type
+    if !@product.display_variants_by_option.blank?
       # Find all variants for the selected product that has the option specified
-      # in the product property product_variants_by_option (e.g. Color) and the
-      # selected value for that option (e.g. Red)
+      # in the product field display_variants_by_option (e.g. Color) and the
+      # selected value for that option (e.g. Red). Sort by variants.id, we use the first
+      # variant to find the images and short desctiption to display
       @variants = Variant.active.find_all_by_product_id(@product.id,
         :include => [:images, {:option_values => :option_type}],
-        :conditions => "variants.is_master = FALSE AND option_types.name = '#{property.product_properties.first.value}' AND option_values.name = '#{params[:option]}'",
+        :conditions => "variants.is_master = FALSE AND option_types.name = '#{@product.display_variants_by_option}' AND option_values.name = '#{params[:option]}'",
         :order => 'variants.id')
       # Find the taxonomy selected to find this product, we store this in a cookie.
       if cookies[:product_variants_by_option_taxon]
         @taxon = @product.taxons.find_by_permalink(cookies[:product_variants_by_option_taxon])
+        # Add additional breadcrumbs
         @product_variants_by_option = ActiveSupport::OrderedHash.new
         @product_variants_by_option[@product.name] = product_url(@product)
         @product_variants_by_option[@variants.first.short_description] =
