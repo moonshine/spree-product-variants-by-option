@@ -11,7 +11,7 @@
   <% @variants.each do |variant| %>
     <li id="variant_<%= variant[1].id %>">
       <%= link_to small_image(variant[1]), show_variant_path(:id => @product.permalink, :option => variant[0]) %>
-      <%= link_to variant[1].short_description + "<span class='price selling'>#{product_price(variant[1])}</span>",
+      <%= link_to "#{variant[1].try(:short_description)} <span class='price selling'>#{product_price(variant[1])}</span>",
         show_variant_path(:id => @product.permalink, :option => variant[0]), :class => 'info' %>
     </li>
   <% end %>
