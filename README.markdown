@@ -29,13 +29,13 @@ To have the variants displayed and grouped by an option type a new fields has be
 called display_variants_by_option which is available in the product edit form. The "name" of the option type
 that you want to group by is specified in this field. For example if you defined an option type called "TT_Color"
 to hold the color variants of your product then you can set the display_variants_by_option to this value and the
-extension will group all variants for the selected product by the option type values.
+extension will group all variants for the selected product by the "TT_Color" option type values.
 
 If no value is specified in this field then the default Spree behaviour will be used.
 
 ### Variant images & short description
 
-A new short_description field has been added the the variants table that will be displayed as the
+A new short_description field has been added to the variants table that will be displayed as the
 description for each variant.
 
 ** Please note that the extension will use the images and short description from the first variant found
