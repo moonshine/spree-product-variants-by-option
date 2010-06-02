@@ -1,39 +1,47 @@
 # Product Variants By Option
 
 This Spree extension allows you to override the default behaviour of Spree when displaying a product.
-When the customer selects a product, by default Spree will display the details of the selected product
-including all of it's variants.
+When the customer selects a product from the products index page, by default Spree will display the details
+of the selected product including all of it's variants, e.g. sizes and colors.
 
-This extension allows you to override the default behaviour by introducing another level. When the customer
-selects the product, another page is displayed showing all variants of the product grouped by a specified
-option type, for example color. If I had a product called 'TeesTanks' with a number of color variations say
-red, white, grey the new page will show 
+This extension allows you to override the default behaviour, when a customer selects a product from the products
+index page, a new page is displayed similar to the products index page displaying all product variants
+grouped by a specified option type, for example color. If I had a product called 'TeesTanks' with a number of color
+variants say red, white, and grey a new index like page is displayed with an entry for each of the color variants. Each
+entry will have a link in the following format:
 
-## usage
+/products/<product name>/<option type value>
 
-set promotions by calling "Promotions.create :product => some_prod" in the
-console etc (no nice admin interface yet)
+example:
 
-call Promotions.random_subset(n) to get n products
+Red varaint = /products/teestanks/red
+White variant = /products/teestanks/white
 
-call Promotions.best_sellers(n, start = 1.week.ago, finish = Time.now) to get
-the n best sellers in the selected time period (default: the past week)
+When the a link is selected, the information for that variant is displayed including images linked to the variant
+and a short description specific to that variant.
 
+## Usage
 
+### Specify option type to group by
 
+To have the variants displayed and grouped by an option type a new fields has been added to the product table
+called display_variants_by_option which is available in the product edit form. The "name" of the option type
+that you want to group by is specified in this field. For example if you defined an option type called "TT_Color"
+to hold the color variants of your product then you can set the display_variants_by_option to this value and the
+extension will group all variants for the selected product by the option type values.
 
-## implementation etc
+If no value is specified in this field then the default Spree behaviour will be used.
 
-at present: just a table of ids, with no uniqueness checking
+### Variant images & short description
 
+A new short_description field has been added the the variants table that will be displayed as the
+description for each variant.
 
+** Please note that the extension will use the images and short description from the first variant found
+in each group. For example if you created Red Small, Red Meduim and Red Large varaints for a product in this order
+then the images and short description of the "Red Small" variant will be used as it is the first one that was created.
 
 ## TODO list
 
-  0. admin interface
-     flag on each product? or drop-down list?
-
-  2. filter this by taxons??
-
-  3. maybe extend to "also bought"?
+Tests
 
