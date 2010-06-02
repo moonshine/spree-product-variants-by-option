@@ -19,7 +19,13 @@ module Spree::ProductVariantsByOption::TaxonsHelper
         crumbs << content_tag(:li, link_to(t('products') , products_path) + separator)
         crumbs << taxon.ancestors.collect { |ancestor| content_tag(:li, link_to(ancestor.name , seo_url(ancestor)) + separator) } unless taxon.ancestors.empty?
         crumbs << content_tag(:li, link_to(taxon.name, seo_url(taxon)) + separator)
-        crumbs << content_tag(:li, content_tag(:span, @product.name))
+        @product_variants_by_option.each_with_index do |v, i|
+          if i < @product_variants_by_option.length - 1
+            crumbs << content_tag(:li, link_to(v[0], v[1]) + separator)
+          else
+            crumbs << content_tag(:li, content_tag(:span, v[0]))
+          end
+        end
       else
         crumbs << content_tag(:li, content_tag(:span, t('products')))
       end

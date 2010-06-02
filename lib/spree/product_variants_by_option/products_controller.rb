@@ -22,9 +22,6 @@ module Spree::ProductVariantsByOption::ProductsController
     @product = Product.find_by_permalink(params[:id])
     property = @product.properties.find_by_name("product_variants_by_option")
     if property && cookies[:product_variants_by_option_taxon]
-      load_object
-      before :show
-
       # Find all variants for selected product, exclude master variant
       variants = Variant.active.find_all_by_product_id(@product.id,
         :include => [:images, :option_values], :conditions => {:is_master => false})
@@ -47,11 +44,13 @@ module Spree::ProductVariantsByOption::ProductsController
 
         # For breadcrumbs we have to find the taxonomy selected to
         # find this product, we store this in a cookie.
-        @taxon = @product.taxons.find_by_permalink(cookies[:product_variants_by_option_taxon])
-
-        # Set this variable to allow us to customise breadcrumb behaviour as currently
-        # there are no hooks available to override this
-        @product_variants_by_option = true
+        if cookies[:product_variants_by_option_taxon]
+          @taxon = @product.taxons.find_by_permalink(cookies[:product_variants_by_option_taxon])
+          # Set this variable to allow us to customise breadcrumb behaviour as currently
+          # there are no hooks available to override this
+          @product_variants_by_option = ActiveSupport::OrderedHash.new
+          @product_variants_by_option[@product.name] = product_url(@product)
+        end
 
         render :template => 'products/variants_by_option'
       else
@@ -78,12 +77,10 @@ module Spree::ProductVariantsByOption::ProductsController
   def site_show_variant
     # Find products
     @product = Product.find_by_permalink(params[:id])
-    # Find the taxonomy selected to find this product, we store this in a cookie.
-    @taxon = @product.taxons.find_by_permalink(cookies[:product_variants_by_option_taxon])
     # Find all product properties excluding the product_variants_by_option
     # property
     @product_properties = ProductProperty.find_all_by_product_id(@product.id,
-      :include => [:property], :conditions => "name != 'product_variants_by_option'")
+      :include => [:property], :conditions => "properties.name != 'product_variants_by_option'")
     # Find the product_variants_by_option property
     property = @product.properties.find_by_name("product_variants_by_option")
     if property
@@ -92,9 +89,18 @@ module Spree::ProductVariantsByOption::ProductsController
       # selected value for that option (e.g. Red)
       @variants = Variant.active.find_all_by_product_id(@product.id,
         :include => [:images, {:option_values => :option_type}],
-        :conditions => "variants.is_master = FALSE AND option_types.name = '#{property.product_properties.first.value}' AND option_values.name = '#{params[:option]}'")
-      # Make sure it is available
-      @selected_variant = @variants.detect { |v| v.available? }
+        :conditions => "variants.is_master = FALSE AND option_types.name = '#{property.product_properties.first.value}' AND option_values.name = '#{params[:option]}'",
+        :order => 'variants.id')
+      # Find the taxonomy selected to find this product, we store this in a cookie.
+      if cookies[:product_variants_by_option_taxon]
+        @taxon = @product.taxons.find_by_permalink(cookies[:product_variants_by_option_taxon])
+        @product_variants_by_option = ActiveSupport::OrderedHash.new
+        @product_variants_by_option[@product.name] = product_url(@product)
+        @product_variants_by_option[@variants.first.short_description] =
+          show_variant_url(:id => @product.permalink, :option => params[:option])
+        @selected_variant = @variants.detect {|v| v.available?}
+      end
+
     else
       spree_show
     end
