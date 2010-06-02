@@ -10,7 +10,7 @@ grouped by a specified option type, for example color. If I had a product called
 variants say red, white, and grey a new index like page is displayed with an entry for each of the color variants. Each
 entry will have a link in the following format:
 
-/products/<<product name>>/<<option type value>>
+/products/[product name]/[option type value]
 
 example:
 
