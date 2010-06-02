@@ -15,6 +15,7 @@ entry will have a link in the following format:
 example:
 
 Red varaint = /products/teestanks/red
+
 White variant = /products/teestanks/white
 
 When the a link is selected, the information for that variant is displayed including images linked to the variant
