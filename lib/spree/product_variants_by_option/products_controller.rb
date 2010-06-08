@@ -24,7 +24,7 @@ module Spree::ProductVariantsByOption::ProductsController
       # as we use the first variant to determine what images and short description to display.
       variants = Variant.active.find_all_by_product_id(@product.id,
         :include => [:images, :option_values],
-        :conditions => "is_master = #{false}",
+        :conditions => ["is_master = ?", false],
         :order => 'variants.id')
       # Find the option type we will group the variants by as specified in
       # the display_variants_by_option product field
@@ -86,7 +86,8 @@ module Spree::ProductVariantsByOption::ProductsController
       # variant to find the images and short desctiption to display
       @variants = Variant.active.find_all_by_product_id(@product.id,
         :include => [:images, {:option_values => :option_type}],
-        :conditions => ["variants.is_master = #{false} AND option_types.name = '#{@product.display_variants_by_option}' AND option_values.name = ?", params[:option]],
+        :conditions => ["variants.is_master = ? AND option_types.name = ? AND option_values.name = ?",
+          false, @product.display_variants_by_option, params[:option]],
         :order => 'variants.id')
       # Find the taxonomy selected to find this product, we store this in a cookie.
       if cookies[:product_variants_by_option_taxon]
