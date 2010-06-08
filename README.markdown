@@ -45,7 +45,7 @@ then the images and short description of the "Red Small" variant will be used as
 ### Show Page
 
 The show page (products/show_variant.html) for the selected variant in this extension is an example only and will
-need to be modified to suit. This can be done in overriding the products/show_variant.html view in your site
+need to be modified to suit. This can be done by overriding the products/show_variant.html view in your site
 extension or similar.
 
 ## TODO list

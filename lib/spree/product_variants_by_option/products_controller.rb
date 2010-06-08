@@ -3,7 +3,7 @@ module Spree::ProductVariantsByOption::ProductsController
   def self.included(target)
     target.class_eval do
       # Override spree product show method
-      alias :spree_show :show
+      alias :spree_show :show unless method_defined?(:spree_show)
       def show; site_show; end
       def show_variant; site_show_variant; end
     end
