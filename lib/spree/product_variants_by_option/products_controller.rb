@@ -45,7 +45,7 @@ module Spree::ProductVariantsByOption::ProductsController
         # For breadcrumbs we have to find the taxonomy selected to
         # find this product, we store this in a cookie.
         if cookies[:product_variants_by_option_taxon]
-          @taxon = @product.taxons.find_by_permalink(cookies[:product_variants_by_option_taxon])
+          @taxon = Taxon.find_by_permalink(cookies[:product_variants_by_option_taxon])
           # Construct a hash with additional breadcrumbs
           @product_variants_by_option = ActiveSupport::OrderedHash.new
           @product_variants_by_option[@product.name] = product_url(@product)
