@@ -19,7 +19,7 @@ module Spree::ProductVariantsByOption::ProductsController
     # with the value being the name of the option type to group by. If this
     # field is not specified for the product then the normal show action will be called.
     @product = Product.find_by_permalink(params[:id])
-    if !@product.display_variants_by_option.blank? && cookies[:product_variants_by_option_taxon]
+    if !@product.display_variants_by_option.blank?
       # Find all variants for selected product, exclude master variant, sort by variants.id
       # as we use the first variant to determine what images and short description to display.
       variants = Variant.active.find_all_by_product_id(@product.id,
@@ -89,16 +89,15 @@ module Spree::ProductVariantsByOption::ProductsController
         :conditions => ["variants.is_master = #{false} AND option_types.name = '#{@product.display_variants_by_option}' AND option_values.name = ?", params[:option]],
         :order => 'variants.id')
       # Find the taxonomy selected to find this product, we store this in a cookie.
-      if cookies[:product_variants_by_option_taxon] && @variants
+      if cookies[:product_variants_by_option_taxon]
         @taxon = @product.taxons.find_by_permalink(cookies[:product_variants_by_option_taxon])
         # Add additional breadcrumbs
         @product_variants_by_option = ActiveSupport::OrderedHash.new
         @product_variants_by_option[@product.name] = product_url(@product)
         @product_variants_by_option[@variants.first.short_description] =
           show_variant_url(:id => @product.permalink, :option => params[:option])
-        @selected_variant = @variants.first
       end
-
+      @selected_variant = @variants.first if @variants
     else
       spree_show
     end
