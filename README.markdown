@@ -42,6 +42,12 @@ description for each variant.
 in each group. For example if you created Red Small, Red Meduim and Red Large varaints for a product in this order
 then the images and short description of the "Red Small" variant will be used as it is the first one that was created.
 
+### Show Page
+
+The show page (products/show_variant.html) for the selected variant in this extension is an example only and will
+need to be modified to suit. This can be done in overriding the products/show_variant.html view in your site
+extension or similar.
+
 ## TODO list
 
 Tests
