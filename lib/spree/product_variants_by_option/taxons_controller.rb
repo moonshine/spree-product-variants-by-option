@@ -9,7 +9,7 @@ module Spree::ProductVariantsByOption::TaxonsController
   private
 
   def store_nav_info
-    taxon = end_of_association_chain.find_by_permalink(params[:id].join("/") + "/")
+    taxon = Taxon.find_by_permalink(params[:id].join("/") + "/")
     cookies[:product_variants_by_option_taxon] = taxon.permalink if taxon
   end
   
