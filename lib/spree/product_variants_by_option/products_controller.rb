@@ -95,7 +95,7 @@ module Spree::ProductVariantsByOption::ProductsController
         # Add additional breadcrumbs
         @product_variants_by_option = ActiveSupport::OrderedHash.new
         @product_variants_by_option[@product.name] = product_url(@product)
-        @product_variants_by_option[@variants.first.short_description] =
+        @product_variants_by_option[!@variants.first.short_description.blank? ? @variants.first.short_description : @variants.first.product.name+'.'] =
           show_variant_url(:id => @product.permalink, :option => params[:option])
       end
       @selected_variant = @variants.first if @variants
