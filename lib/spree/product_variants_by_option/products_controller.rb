@@ -76,6 +76,8 @@ module Spree::ProductVariantsByOption::ProductsController
   def site_show_variant
     # Find products
     @product = Product.find_by_permalink(params[:id])
+    # Find all product properties
+    @product_properties = ProductProperty.find_all_by_product_id(@product.id, :include => [:property])
     # Check if we need to display product group by an option type
     if !@product.display_variants_by_option.blank?
       # Find all variants for the selected product that has the option specified
