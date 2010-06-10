@@ -4,7 +4,7 @@ module Spree::ProductVariantsByOption::ProductsController
     target.class_eval do
       # Override spree product show method
       alias :spree_show :show unless method_defined?(:spree_show)
-      def show; site_show; end
+      alias :show :site_show
       def show_variant; site_show_variant; end
     end
   end
@@ -76,8 +76,6 @@ module Spree::ProductVariantsByOption::ProductsController
   def site_show_variant
     # Find products
     @product = Product.find_by_permalink(params[:id])
-    # Find all product properties
-    @product_properties = ProductProperty.find_all_by_product_id(@product.id, :include => [:property])
     # Check if we need to display product group by an option type
     if !@product.display_variants_by_option.blank?
       # Find all variants for the selected product that has the option specified
@@ -100,6 +98,7 @@ module Spree::ProductVariantsByOption::ProductsController
       end
       @selected_variant = @variants.first if @variants
     else
+      load_data
       spree_show
     end
   end
