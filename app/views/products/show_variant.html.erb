@@ -1,22 +1,26 @@
-<% @body_id = 'product-details' %>
-<h1><%= @variants.first.short_description.blank? ? @product.name : @variants.first.short_description %></h1>
+<% if !@variants || @variants.empty?%>
+  <%=  t(:no_variants_found) %>
+<%  else %>
+  <% @body_id = 'product-details' %>
+  <h1><%= @variants.first.short_description.blank? ? @product.name : @variants.first.short_description %></h1>
 
-<div id="product-images">
-  <div id="main-image">
-    <%= product_image(@selected_variant) %>
+  <div id="product-images">
+    <div id="main-image">
+      <%= product_image(@selected_variant) %>
+    </div>
+    <div id="thumbnails">
+      <%= render 'thumbnails', :product => @product -%>
+    </div>
   </div>
-  <div id="thumbnails">
-    <%= render 'thumbnails', :product => @product -%>
+
+  <div id="product-description">
+    <%= product_description(@product) rescue t("product_has_no_description") %>
+    <%= render 'properties' %>
   </div>
-</div>
 
-<div id="product-description">
-  <%= product_description(@product) rescue t("product_has_no_description") %>
-  <%= render 'properties' %>
-</div>
+  <div id="cart-form">
+    <%= render 'cart_form' %>
+  </div>
 
-<div id="cart-form">
-  <%= render 'cart_form' %>
-</div>
-
-<%= render 'taxons' %>
+  <%= render 'taxons' %>
+<% end %>
