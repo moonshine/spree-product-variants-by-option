@@ -90,15 +90,19 @@ module Spree::ProductVariantsByOption::ProductsController
           false, @product.display_variants_by_option, params[:option]],
         :order => 'variants.id')
       # Find the taxonomy selected to find this product, we store this in a cookie.
-      if cookies[:product_variants_by_option_taxon] && @variants && !@variants.empty?
-        @taxon = @product.taxons.find_by_permalink(cookies[:product_variants_by_option_taxon])
-        # Add additional breadcrumbs
-        @product_variants_by_option = ActiveSupport::OrderedHash.new
-        @product_variants_by_option[@product.name] = product_url(@product)
-        @product_variants_by_option[!@variants.first.short_description.blank? ? @variants.first.short_description : @variants.first.product.name+' '+params[:option]] =
-          show_variant_url(:id => @product.permalink, :option => params[:option])
+      if @variants && !@variants.empty?
+        if cookies[:product_variants_by_option_taxon] &&
+          @taxon = @product.taxons.find_by_permalink(cookies[:product_variants_by_option_taxon])
+          # Add additional breadcrumbs
+          @product_variants_by_option = ActiveSupport::OrderedHash.new
+          @product_variants_by_option[@product.name] = product_url(@product)
+          @product_variants_by_option[!@variants.first.short_description.blank? ? @variants.first.short_description : @variants.first.product.name+' '+params[:option]] =
+            show_variant_url(:id => @product.permalink, :option => params[:option])
+        end
+        @selected_variant = @variants.first
       end
-      @selected_variant = @variants.first if @variants
+    else
+      @variants = Array.new
     end
   end
 
