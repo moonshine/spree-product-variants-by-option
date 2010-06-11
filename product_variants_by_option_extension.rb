@@ -16,5 +16,7 @@ class ProductVariantsByOptionExtension < Spree::Extension
       {:name => 'short_description', :only => [:variant]},
       {:name => 'display_variants_by_option', :only => [:product]}
       ]
+    # Add method to retrieve the option value for a variant
+    ProductsHelper.send(:include, Spree::ProductVariantsByOption::ProductsHelper)
   end
 end

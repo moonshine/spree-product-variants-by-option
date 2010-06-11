@@ -6,10 +6,30 @@ module Spree::ProductVariantsByOption::ProductsController
       alias :spree_show :show unless method_defined?(:spree_show)
       def show; site_show; end
       def show_variant; site_show_variant; end
+      def show_all_variants; site_show_all_variants; end
     end
   end
 
   private
+
+  # Show all variants on the products/index page
+  def site_show_all_variants
+    # Find all active variants
+    variants = Variant.active(
+      :include   => :option_values,
+      :order => 'variants.product_id, variants.')
+    # Remove master records that are not required, i.e.
+    # where the product has variants
+    variants.each do |v|
+      if v.product.variants.any? && v.is_master?
+        variants.delete(v)
+      end
+    end
+    # Setup pagination
+    @variants = variants.paginate(
+      :per_page  => Spree::Config[:admin_products_per_page],
+      :page      => params[:page])
+  end
 
   # Show all variants for the selected product filtered
   # by the specified option
