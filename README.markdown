@@ -48,6 +48,19 @@ The show page (products/show_variant.html) for the selected variant in this exte
 need to be modified to suit. This can be done by overriding the products/show_variant.html view in your site
 extension or similar.
 
+### Override the root (products/index)
+
+The extenstion allows you to override the default root or products/index page by displaying a paginated list
+of all active variants rather than a list of all the products. It will order the display by product ID and variant ID.
+It will NOT display any master variants that belong to a product that have other variants, master variants that
+belong to a product that have no other variants will still be displayed.
+
+This behaviour is switched off by default, to get this behaviour to work you will need to uncomment the following
+two routes within the routes file:
+
+map.root :controller => "products", :action => "show_all_variants"
+map.show_all_variants "products/index", :controller => "products", :action => "show_all_variants"
+
 ## TODO list
 
 Tests
