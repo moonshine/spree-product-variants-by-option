@@ -18,5 +18,8 @@ class ProductVariantsByOptionExtension < Spree::Extension
       ]
     # Add method to retrieve the option value for a variant
     ProductsHelper.send(:include, Spree::ProductVariantsByOption::ProductsHelper)
+    # Add named_scope to find all active variants that are not a master or
+    # is a master for a product that have no other variants
+    Variant.send(:include, Spree::ProductVariantsByOption::Variant)
   end
 end

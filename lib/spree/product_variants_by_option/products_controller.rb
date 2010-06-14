@@ -14,19 +14,9 @@ module Spree::ProductVariantsByOption::ProductsController
 
   # Show all variants on the products/index page
   def site_show_all_variants
-    # Find all active variants
-    variants = Variant.active(
-      :include   => :option_values,
-      :order => 'variants.product_id, variants.')
-    # Remove master records that are not required, i.e.
-    # where the product has variants
-    variants.each do |v|
-      if v.product.variants.any? && v.is_master?
-        variants.delete(v)
-      end
-    end
-    # Setup pagination
-    @variants = variants.paginate(
+    # Find all active variants that are NOT a master record or master
+    # variants that have no other variants & setup pagination
+    @variants = Variant.active.no_duplicates.paginate(
       :per_page  => Spree::Config[:admin_products_per_page],
       :page      => params[:page])
   end
