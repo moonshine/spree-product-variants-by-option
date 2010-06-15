@@ -16,7 +16,7 @@ module Spree::ProductVariantsByOption::ProductsController
   def site_show_all_variants
     variants = Array.new
     # Find all active products in the system
-    Product.not_deleted.each do |product|
+    Product.active.each do |product|
       # Check if it has variants other than the master
       if product.variants.any?
         # Check if this product should be groups
