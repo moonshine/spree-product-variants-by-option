@@ -14,6 +14,7 @@ module Spree::ProductVariantsByOption::TaxonsHelper
   def site_breadcrumbs(taxon, separator="&nbsp;&raquo;&nbsp;")
     if @product_variants_by_option
       return "" if current_page?("/")
+      separator = raw(separator)
       crumbs = [content_tag(:li, link_to(t(:home) , root_path) + separator)]
       if taxon
         crumbs << content_tag(:li, link_to(t('products') , products_path) + separator)

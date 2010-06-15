@@ -8,9 +8,17 @@
 
 <% if @variants.any? %>
 <ul class="product-listing">
-  <% @variants.each do |option, variant| %>
-    <%= render :partial => 'variant', :locals => {:variant => variant, :option => option, :options_text => ''} %>
+  <% @variants.each do |variant| %>
+    <%= render :partial => 'variant', :locals => {:variant => variant, :option => get_variant_option(variant), :options_text => variant.options_text} %>
   <% end %>
 </ul>
 <% end %>
 
+<hr class="space" />
+
+<% if @variants.respond_to?(:total_pages)%>
+  <%= will_paginate(@variants,
+                    :previous_label => "&#171; #{t('previous')}",
+                    :next_label => "#{t('next')} &#187;") %>
+<% end %>
+<hr class="space" />

@@ -14,11 +14,32 @@ module Spree::ProductVariantsByOption::ProductsController
 
   # Show all variants on the products/index page
   def site_show_all_variants
-    # Find all active variants that are NOT a master record or master
-    # variants that have no other variants & setup pagination
-    @variants = Variant.active.no_duplicates.paginate(
+    variants = Array.new
+    # Find all active products in the system
+    Product.not_deleted.each do |product|
+      # Check if it has variants other than the master
+      if product.variants.any?
+        # Check if this product should be groups
+        if !product.display_variants_by_option.blank? &&
+          (option_type = OptionType.find_by_name(product.display_variants_by_option))
+          # Find all variants and group by specified option type value
+          product.variants.group_by_option_type(option_type).each {|v| variants << v}
+        else
+          # Not grouped so find all variants
+          product.variants.each {|v| variants << v}
+        end
+      else
+        # Product only has a master
+        variants << product.master
+      end
+    end
+    
+    # Paginate variants
+    @variants = variants.paginate(
       :per_page  => Spree::Config[:admin_products_per_page],
       :page      => params[:page])
+    
+    render :template => 'products/variants_by_option'
   end
 
   # Show all variants for the selected product filtered
@@ -30,28 +51,16 @@ module Spree::ProductVariantsByOption::ProductsController
     # field is not specified for the product then the normal show action will be called.
     @product = Product.find_by_permalink(params[:id])
     if !@product.display_variants_by_option.blank?
-      # Find all variants for selected product, exclude master variant, sort by variants.id
-      # as we use the first variant to determine what images and short description to display.
-      variants = Variant.active.find_all_by_product_id(@product.id,
-        :include => [:images, :option_values],
-        :conditions => ["is_master = ?", false],
-        :order => 'variants.id')
       # Find the option type we will group the variants by as specified in
       # the display_variants_by_option product field
-      property_value = @product.display_variants_by_option
-      option_type = OptionType.find_by_name(property_value)
+      option_type = OptionType.find_by_name(@product.display_variants_by_option)
       if option_type
-        # Process all product variants, check each variant for the specified
-        # option type. The variant will be added to the hash if the option
-        # type value has not been seen before, i.e. we only store the first variant
-        # with the value all other are ignored. Example: If we have 4 red coloured t-shirts
-        # sizes s,m,l,xl then only the first variant with red as it's option type value
-        # will be stored in the hash.
-        @variants = Hash.new
-        variants.each do |variant|
-          option_type_name = variant.option_values.first(:conditions => {:option_type_id => option_type.id}).name
-          @variants[option_type_name] = variant unless @variants.include?(option_type_name)
-        end
+        # Find all variants and group by the specified option type value, example
+        # if we had red, blue, and green tshirt variants of different sizes and we
+        # nominated to group by color. The following code will find all variants
+        # and group them by color, so we will end up with one record for each color.
+        variants = Array.new
+        @product.variants.group_by_option_type(option_type).each {|v| variants << v}
 
         # For breadcrumbs we have to find the taxonomy selected to
         # find this product, we store this in a cookie.
@@ -61,6 +70,11 @@ module Spree::ProductVariantsByOption::ProductsController
           @product_variants_by_option = ActiveSupport::OrderedHash.new
           @product_variants_by_option[@product.name] = product_url(@product)
         end
+
+        # Paginate variants
+        @variants = variants.paginate(
+          :per_page  => Spree::Config[:admin_products_per_page],
+          :page      => params[:page])
 
         render :template => 'products/variants_by_option'
       else

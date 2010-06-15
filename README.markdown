@@ -51,14 +51,15 @@ extension or similar.
 ### Override the root (products/index)
 
 The extenstion allows you to override the default root or products/index page by displaying a paginated list
-of all active variants rather than a list of all the products. It will order the display by product ID and variant ID.
-It will NOT display any master variants that belong to a product that have other variants, master variants that
-belong to a product that have no other variants will still be displayed.
+of all active variants rather than a list of all the products. Product variants that belong to a product that
+has been set to be grouped by a nominated option type will still be grouped, if the product has not been set to
+be grouped then all product variants will be displayed.
 
 This behaviour is switched off by default, to get this behaviour to work you will need to uncomment the following
 two routes within the routes file:
 
 map.root :controller => "products", :action => "show_all_variants"
+
 map.show_all_variants "products/index", :controller => "products", :action => "show_all_variants"
 
 ## TODO list
