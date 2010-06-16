@@ -1,5 +1,5 @@
 <li id="variant_<%= variant.id %>">
-  <%= link_to small_image(variant.is_master? ? variant.product : variant), (variant.is_master? ? variant.product : show_variant_path(:id => variant.product.permalink, :option => option)) %>
+  <%= link_to small_image(variant.is_master? ? variant.product : variant), get_variant_path(variant, option) %>
   <%= link_to "#{variant.short_description.blank? ? variant.product.name : variant.short_description} <span class='price selling'>#{product_price(variant)}</span>",
-    (variant.is_master? ? variant.product : show_variant_path(:id => variant.product.permalink, :option => option)), :class => 'info' %>
+    get_variant_path(variant, option), :class => 'info' %>
 </li>

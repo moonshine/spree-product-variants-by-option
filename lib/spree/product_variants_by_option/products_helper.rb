@@ -11,6 +11,14 @@ module Spree::ProductVariantsByOption::ProductsHelper
           end
         end
       end
+
+      def get_variant_path(variant, option)
+        if variant.is_master? || option.blank?
+          variant.product
+        else
+          show_variant_path(:id => variant.product.permalink, :option => option)
+        end
+      end
     end
   end
 
