@@ -21,5 +21,7 @@ class ProductVariantsByOptionExtension < Spree::Extension
     # Add named_scope to find all active variants that are not a master or
     # is a master for a product that have no other variants
     Variant.send(:include, Spree::ProductVariantsByOption::Variant)
+    # Add method to convert option name to SEO
+    OptionValue.send(:include, Spree::ProductVariantsByOption::OptionValue)
   end
 end
