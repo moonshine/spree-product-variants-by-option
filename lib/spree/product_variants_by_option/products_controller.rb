@@ -26,7 +26,7 @@ module Spree::ProductVariantsByOption::ProductsController
           product.variants.group_by_option_type(option_type).each {|v| variants << v}
         else
           # Not grouped so find all variants
-          product.variants.each {|v| variants}
+          product.variants.each {|v| variants << v}
         end
       else
         # Product only has a master
