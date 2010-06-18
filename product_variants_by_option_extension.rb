@@ -15,7 +15,7 @@ class ProductVariantsByOptionExtension < Spree::Extension
     Variant.additional_fields += [ 
       {:name => 'short_description', :only => [:variant]},
       {:name => 'display_variants_by_option', :only => [:product], 
-        :use => 'select', :value => Proc.new {OptionType.all.collect {|o| [ o.name, o.name ] }}}
+        :use => 'select', :value => Proc.new {(OptionType.all.collect {|o| [ o.name, o.name ] } << ['',nil]).reverse!}}
       ]
     # Add method to retrieve the option value for a variant
     ProductsHelper.send(:include, Spree::ProductVariantsByOption::ProductsHelper)
