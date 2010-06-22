@@ -123,7 +123,8 @@ module Spree::ProductVariantsByOption::ProductsController
           @product_variants_by_option[!@variants.first.short_description.blank? ? @variants.first.short_description : @variants.first.product.name+' '+params[:option]] =
             show_variant_url(:id => @product.permalink, :option => params[:option])
         end
-        @selected_variant = @variants.first
+        @selected_variant = @variants.detect { |v| v.available? }
+        @selected_variant ||= @variants.first
       end
     else
       @variants = Array.new

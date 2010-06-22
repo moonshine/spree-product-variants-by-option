@@ -5,8 +5,6 @@ module Spree::ProductVariantsByOption::TaxonsHelper
       alias_method :breadcrumbs, :site_breadcrumbs
     end
   end
-
-  private
   
   # Override breadcrumbs so that we can add the selected product
   # to the breadcrumbs when displaying product variants, also
