@@ -23,6 +23,8 @@ class ProductVariantsByOptionExtension < Spree::Extension
     # is a master for a product that have no other variants
     Variant.send(:include, Spree::ProductVariantsByOption::Variant)
     # Add method to convert option name to SEO
+    OptionType.send(:include, Spree::ProductVariantsByOption::OptionType)
     OptionValue.send(:include, Spree::ProductVariantsByOption::OptionValue)
+
   end
 end
