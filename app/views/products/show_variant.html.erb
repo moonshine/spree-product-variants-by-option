@@ -14,13 +14,19 @@
   </div>
 
   <div id="product-description">
-    <%= product_description(@product) rescue t("product_has_no_description") %>
-    <%= render 'properties' %>
+    <% hook :product_description do %>
+      <%= product_description(@product) rescue t("product_has_no_description") %>
+    <% end %>
+    <% hook :product_properties do %>
+      <%= render 'properties' %>
+    <% end %>
   </div>
 
+<% hook :cart_form do %>
   <div id="cart-form">
     <%= render 'cart_form' %>
   </div>
+<% end %>
 
   <%= render 'taxons' %>
 <% end %>
