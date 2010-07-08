@@ -9,7 +9,9 @@
 <% if @variants.any? %>
 <ul class="product-listing">
   <% @variants.each do |variant| %>
-    <%= render :partial => 'variant', :locals => {:variant => variant, :option => get_variant_option(variant), :options_text => variant.options_text} %>
+    <% if variant.images.count > 0 %>
+      <%= render :partial => 'variant', :locals => {:variant => variant, :option => get_variant_option(variant), :options_text => variant.options_text} %>
+    <% end %>
   <% end %>
 </ul>
 <% end %>
