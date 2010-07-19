@@ -78,10 +78,10 @@ module Spree::ProductVariantsByOption::ProductsController
 
         render :template => 'products/variants_by_option'
       else
-        raise "The option type '#{property_value}'
+        raise "The option type '#{@product.display_variants_by_option}'
           specified in product field 'Display variants by option'
           could not be found for product '#{@product.name}'. Make sure the
-          option type('#{property_value}') has been created and exists."
+          option type('#{@product.display_variants_by_option}') has been created and exists."
       end
     else
       # Property not defined do default show action
